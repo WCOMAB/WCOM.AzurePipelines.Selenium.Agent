@@ -1,6 +1,6 @@
 # Azure DevOps Pipelines Selenium Agent docker image
 
-[![Build Status](https://dev.azure.com/wcom/General/_apis/build/status%2FWCOM.AzurePipelines.DotNet.Agent?branchName=main)](https://dev.azure.com/wcom/General/_build/latest?definitionId=107&branchName=main)
+[![Build Status](https://dev.azure.com/wcom/General/_apis/build/status%2FWCOM.AzurePipelines.Selenium.Agent?branchName=main)](https://dev.azure.com/wcom/General/_build/latest?definitionId=107&branchName=main)
 
 Docker image which can be used to build Azure Pipelines Selenium tests running on i.e. in a AKS cluster.
 
