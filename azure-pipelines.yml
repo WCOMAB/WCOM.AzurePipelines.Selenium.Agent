@@ -1,0 +1,34 @@
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+trigger:
+- develop
+- main
+
+jobs:
+- job: Docker
+  pool:
+    vmImage: ubuntu-latest
+  variables:
+    imageName: $(CONTAINER_REGISTRY)/azp-selenium-chrome-agent
+    isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  steps:
+  - script: |
+      docker build --build-arg BUILD_AZP_TOKEN --build-arg BUILD_AZP_URL --build-arg BUILD_AZP_VERSION -t $(imageName):latest -t $(imageName):$(Build.BuildNumber) .
+    displayName: Docker Build
+    env:
+      BUILD_AZP_TOKEN: $(System.AccessToken)
+      BUILD_AZP_URL: $(System.CollectionUri)
+      BUILD_AZP_VERSION: $(Build.BuildNumber)
+
+  - task: AzureCLI@2
+    displayName: Docker Push
+    inputs:
+      azureSubscription: WCOM ACR Push
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az acr login --name acrwcom
+        docker push $(imageName):$(Build.BuildNumber)
+        docker push $(imageName):latest
+        docker logout
+    condition: and(succeeded(), eq(variables.isMain, true))
