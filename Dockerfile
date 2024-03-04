@@ -25,6 +25,12 @@ RUN . /etc/os-release; \
     && apt-get update \
     && apt-get install -y powershell
 
+# Install Azure CLI
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+    && az upgrade --all --yes \
+    && az bicep upgrade \
+    && az version -o table
+
 WORKDIR /azp/
 
 COPY ./install.sh /azp/
