@@ -27,9 +27,7 @@ RUN . /etc/os-release; \
 
 # Install Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
-    && az upgrade --all --yes \
-    && az bicep upgrade \
-    && az version -o table
+    && az upgrade --all --yes
 
 WORKDIR /azp/
 
@@ -42,12 +40,21 @@ RUN chmod +x ./install.sh \
     && chmod +x ./primedotnet.ps1 \
     && chown -R seluser ./ \
     && mkdir /home/seluser/.local/share/NuGet \
-    && chown -R seluser /home/seluser/.local/share/NuGet
+    && chown -R seluser /home/seluser/.local/share/NuGet \
+    && rm -rf /home/seluser/.azure \
+    && mkdir /home/seluser/.azure \
+    && chown -R seluser /home/seluser/.azure
 
 USER seluser
 
 ENV AGENT_TOOLSDIRECTORY="/azp/tools"
 RUN mkdir /azp/tools
+
+# Clear az cli account / cache
+RUN az account clear \
+    && az cache purge \
+    && az bicep upgrade \
+    && az version -o table
 
 # Install .NET
 ENV NUGET_PACKAGES="/azp/nuget/NUGET_PACKAGES"
