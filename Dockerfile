@@ -15,7 +15,7 @@ USER root
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y curl git jq libicu70 wget apt-transport-https software-properties-common
-RUN apt-get install -y npm zip nodejs python3 python3-pip
+RUN apt-get install -y npm zip nodejs python3 python3-pip ffmpeg
 
 # Install PowerShell
 RUN . /etc/os-release; \
