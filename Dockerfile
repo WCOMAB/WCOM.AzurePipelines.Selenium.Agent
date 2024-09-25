@@ -74,9 +74,6 @@ RUN export AZP_TOKEN=${BUILD_AZP_TOKEN} \
     && export AZP_URL=${BUILD_AZP_URL} \
     && ./install.sh
 
-# Prime .NET
-RUN ./primedotnet.ps1
-
 # Install Global tools
 ENV PATH="${PATH}:/home/seluser/.dotnet/tools"
 RUN dotnet tool install --global dpi \
@@ -87,5 +84,8 @@ RUN dotnet tool install --global dpi \
 # Install PowerShell
 RUN dotnet tool install --global PowerShell \
     && pwsh --version
+
+# Prime .NET
+RUN ./primedotnet.ps1
 
 ENTRYPOINT ./start.sh
