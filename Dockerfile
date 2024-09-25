@@ -17,14 +17,6 @@ RUN apt-get upgrade -y
 RUN apt-get install -y curl git jq libicu74 wget apt-transport-https software-properties-common
 RUN apt-get install -y npm zip nodejs python3 python3-pip ffmpeg
 
-# Install PowerShell
-RUN . /etc/os-release; \
-    wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && rm packages-microsoft-prod.deb \
-    && apt-get update \
-    && apt-get install -y powershell
-
 # Install Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && az upgrade --all --yes
@@ -91,5 +83,9 @@ RUN dotnet tool install --global dpi \
     && dpi --version \
     && dotnet tool install --global Cake.Tool \
     && dotnet cake --info
+
+# Install PowerShell
+RUN dotnet tool install --global PowerShell \
+    && pwsh --version
 
 ENTRYPOINT ./start.sh
