@@ -20,7 +20,7 @@ jobs:
       BUILD_AZP_URL: $(System.CollectionUri)
       BUILD_AZP_VERSION: $(Build.BuildNumber)
 
-  - task: AzureCLI@2
+  - task: AzureCLI@2.251.1
     displayName: Docker Push
     inputs:
       azureSubscription: WCOM ACR Push
