@@ -51,8 +51,8 @@ RUN az account clear \
 # Install .NET
 ENV NUGET_PACKAGES="/azp/nuget/NUGET_PACKAGES"
 ENV NUGET_HTTP_CACHE_PATH="/azp/nuget/NUGET_HTTP_CACHE_PATH"
-ENV NUGET_PLUGINS_CACHE_PATH = "/azp/nuget/NUGET_PLUGINS_CACHE_PATH"
-ENV NUGET_SCRATCH = "/azp/nuget/NUGET_SCRATCH"
+ENV NUGET_PLUGINS_CACHE_PATH="/azp/nuget/NUGET_PLUGINS_CACHE_PATH"
+ENV NUGET_SCRATCH="/azp/nuget/NUGET_SCRATCH"
 ENV PATH="/azp/tools/dotnet:${PATH}"
 ENV DOTNET_ROOT="/azp/tools/dotnet"
 ENV DOTNET_HOST_PATH="/azp/tools/dotnet/dotnet"
@@ -65,7 +65,8 @@ RUN mkdir /azp/nuget \
     && curl -Lsfo "dotnet-install.sh" https://dot.net/v1/dotnet-install.sh \
     && chmod +x "dotnet-install.sh" \
     && ./dotnet-install.sh --channel 8.0 --install-dir /azp/tools/dotnet \
-    && ./dotnet-install.sh --channel 9.0 --install-dir /azp/tools/dotnet
+    && ./dotnet-install.sh --channel 9.0 --install-dir /azp/tools/dotnet \
+    && ./dotnet-install.sh --channel 10.0 --install-dir /azp/tools/dotnet
 
 # Install DevOps Agent
 RUN export AZP_TOKEN=${BUILD_AZP_TOKEN} \

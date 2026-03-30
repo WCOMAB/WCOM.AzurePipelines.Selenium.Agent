@@ -4,7 +4,8 @@ Set-StrictMode -Version 7.3
 
 [string[]] $netversions = @(
     '8.0',
-    '9.0'
+    '9.0',
+    '10.0'
     )
 
 [string[]] $templates = @(
