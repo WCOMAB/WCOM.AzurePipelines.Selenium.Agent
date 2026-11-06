@@ -14,7 +14,10 @@ USER root
 
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y curl git jq libicu74 wget apt-transport-https software-properties-common
+RUN icu="$(apt-cache search --names-only '^libicu[0-9][0-9]+$' | awk '{ print $1 }' | sort -V | tail -n 1)" \
+    && test -n "$icu" \
+    && echo "Installing ${icu}" \
+    && apt-get install -y curl git jq "$icu" wget apt-transport-https software-properties-common
 RUN apt-get install -y npm zip nodejs python3 python3-pip ffmpeg
 
 # Install Azure CLI
