@@ -7,9 +7,8 @@ Docker image which can be used to build Azure Pipelines Selenium tests running o
 ## Installed SDKs
 
 * Selenium Chromium web driver
-* .NET 8
-* .NET 9
 * .NET 10
+* .NET 11
 * Node LTS
 * Python 3
 
