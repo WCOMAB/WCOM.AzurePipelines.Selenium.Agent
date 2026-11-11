@@ -67,9 +67,8 @@ RUN mkdir /azp/nuget \
     && mkdir /azp/tools/dotnet \
     && curl -Lsfo "dotnet-install.sh" https://dot.net/v1/dotnet-install.sh \
     && chmod +x "dotnet-install.sh" \
-    && ./dotnet-install.sh --channel 8.0 --install-dir /azp/tools/dotnet \
-    && ./dotnet-install.sh --channel 9.0 --install-dir /azp/tools/dotnet \
-    && ./dotnet-install.sh --channel 10.0 --install-dir /azp/tools/dotnet
+    && ./dotnet-install.sh --channel 10.0 --install-dir /azp/tools/dotnet \
+    && ./dotnet-install.sh --channel 11.0 --install-dir /azp/tools/dotnet
 
 # Install DevOps Agent
 RUN export AZP_TOKEN=${BUILD_AZP_TOKEN} \
