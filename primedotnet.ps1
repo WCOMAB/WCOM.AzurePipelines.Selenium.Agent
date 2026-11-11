@@ -1,4 +1,4 @@
-#!/home/seluser/.dotnet/tools/pwsh
+#!/usr/bin/env pwsh
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 7.3
 
