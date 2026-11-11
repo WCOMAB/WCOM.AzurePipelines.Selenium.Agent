@@ -40,6 +40,10 @@ RUN chmod +x ./install.sh \
     && mkdir /home/seluser/.azure \
     && chown -R seluser /home/seluser/.azure
 
+# Publish PowerShell on usual /usr paths; install later fills these in
+RUN ln -sfn /azp/tools/powershell /usr/share/powershell \
+    && ln -sfn /azp/tools/powershell/pwsh /usr/bin/pwsh
+
 USER seluser
 
 ENV AGENT_TOOLSDIRECTORY="/azp/tools"
@@ -82,8 +86,18 @@ RUN dotnet tool install --global dpi \
     && dotnet tool install --global Cake.Tool \
     && dotnet cake --info
 
-# Install PowerShell
-RUN dotnet tool install --global PowerShell \
+# Install PowerShell (RID package isn't on nuget.org, fetch it from the PowerShell feed)
+ENV POWERSHELL_TELEMETRY_OPTOUT=1 \
+    POWERSHELL_UPDATECHECK=Off
+RUN powershell_version="$(curl -fsSL https://aka.ms/pwsh-buildinfo-stable \
+        | jq -er '.ReleaseTag | ltrimstr("v")')" \
+    && curl --fail --show-error --location --output "/tmp/PowerShell.Linux.x64.${powershell_version}.nupkg" \
+        "https://powershellinfraartifacts-gkhedzdeaghdezhr.z01.azurefd.net/tool/${powershell_version}/PowerShell.Linux.x64.${powershell_version}.nupkg" \
+    && /azp/tools/dotnet/dotnet tool install --add-source /tmp --tool-path /azp/tools/powershell --version "${powershell_version}" PowerShell.Linux.x64 \
+    && rm -f "/tmp/PowerShell.Linux.x64.${powershell_version}.nupkg" \
+    && chmod 755 /azp/tools/powershell/pwsh \
+    && chmod 755 /azp/tools/powershell/.store/powershell.linux.x64/${powershell_version}/powershell.linux.x64/${powershell_version}/tools/*/any/pwsh \
+    && find /azp/tools/powershell -iname '*.nupkg' -delete \
     && pwsh --version
 
 # Prime .NET
