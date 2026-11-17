@@ -7,28 +7,58 @@ trigger:
 jobs:
 - job: Docker
   pool:
-    vmImage: ubuntu-latest
+    vmImage: ubuntu-26.04
   variables:
     imageName: $(CONTAINER_REGISTRY)/azp-selenium-chrome-agent
     isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   steps:
   - script: |
+      echo "=== Disk before cleanup ==="
+      df -h
+      docker system df || true
+
+      echo "=== Reclaim unused hosted-agent caches ==="
+      sudo rm -rf /usr/local/lib/android || true
+      sudo rm -rf /opt/ghc /usr/local/.ghcup || true
+      sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+
+      echo "=== Disk after cleanup ==="
+      df -h
+      docker system df || true
+    displayName: Reclaim hosted agent disk
+
+  - script: |
       docker build --build-arg BUILD_AZP_TOKEN --build-arg BUILD_AZP_URL --build-arg BUILD_AZP_VERSION -t $(imageName):latest -t $(imageName):$(Build.BuildNumber) .
     displayName: Docker Build
+    condition: and(succeeded(), ne(variables.isMain, true))
     env:
+      DOCKER_BUILDKIT: 1
       BUILD_AZP_TOKEN: $(System.AccessToken)
       BUILD_AZP_URL: $(System.CollectionUri)
       BUILD_AZP_VERSION: $(Build.BuildNumber)
 
   - task: AzureCLI@3.280.5
-    displayName: Docker Push
+    displayName: Docker Build and Push
     inputs:
       azureSubscription: WCOM ACR Push
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
         az acr login --name acrwcom
-        docker push $(imageName):$(Build.BuildNumber)
-        docker push $(imageName):latest
-        docker logout
+        docker buildx build \
+          --build-arg BUILD_AZP_TOKEN \
+          --build-arg BUILD_AZP_URL \
+          --build-arg BUILD_AZP_VERSION \
+          --tag "$(imageName):latest" \
+          --tag "$(imageName):$(Build.BuildNumber)" \
+          --output type=registry,compression=gzip,compression-level=9,force-compression=true \
+          .
+        build_status=$?
+        docker logout || true
+        exit $build_status
     condition: and(succeeded(), eq(variables.isMain, true))
+    env:
+      DOCKER_BUILDKIT: 1
+      BUILD_AZP_TOKEN: $(System.AccessToken)
+      BUILD_AZP_URL: $(System.CollectionUri)
+      BUILD_AZP_VERSION: $(Build.BuildNumber)
